@@ -75,7 +75,7 @@ async def handle_query(request: QueryRequest):
 
         # Layer 1: RAG Retrieval
         # We expect retrieve_context to return (context_text, distances, metadatas)
-        context, distances, metadatas = retrieve_context(request.question)
+        context, distances, metadatas = retrieve_context(request.question , n_results=5)
 
         # Generation Step
         llm_result = generate_answer(request.question, context, model_name)
@@ -85,8 +85,9 @@ async def handle_query(request: QueryRequest):
         flags = [flag_label] if is_flagged else []
 
         # Mandatory Contract Check: "no_context" flag
-        if len(distances) == 0:
-            flags.append("no_context")
+        if len(distances) == 0 or distances[0] > 0.8:
+            if "no_context" not in flags:
+                flags.append("no_context")
 
         # Performance Tracking
         latency_ms = int((time.perf_counter() - start_time) * 1000)
@@ -95,7 +96,7 @@ async def handle_query(request: QueryRequest):
         sources_list = []
         for i in range(len(distances)):
             # Convert distance to a 0-1 relevance score
-            score = max(0.0, min(1.0, 1.0 - distances[i]))
+            score = 1 - distances[i]
             sources_list.append(Source(
                 document=metadatas[i].get('source', 'Unknown'),
                 relevance_score=round(score, 2)

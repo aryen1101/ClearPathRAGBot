@@ -5,7 +5,10 @@ from sentence_transformers import SentenceTransformer
 
 
 client = chromadb.PersistentClient(path="./chroma_db")
-collection = client.get_or_create_collection("docs")
+collection = client.get_or_create_collection(
+    name="docs",
+    metadata={"hnsw:space": "cosine"} # This changes the math to 0-1 range
+)
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 

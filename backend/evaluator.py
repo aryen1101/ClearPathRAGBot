@@ -7,8 +7,8 @@ def evaluate_response(response: str, distances: list):
 
     # 1. No-context check: 
     # If the distance from ChromaDB is too high, it means we found no real match.
-    # Typically, in ChromaDB, a distance > 1.5 indicates a poor match.
-    if not distances or distances[0] > 1.5:
+    # Typically, in ChromaDB, a distance > 0.7 indicates a poor match.
+    if not distances or distances[0] > 0.7:
         return True, "Low confidence — no relevant documentation found."
 
     # 2. Refusals or non-answers:
