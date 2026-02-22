@@ -1,0 +1,14 @@
+# Exclude heavy folders that Railway should NOT build
+.venv/
+venv/
+__pycache__/
+.git/
+.ipynb_checkpoints/
+*.pyc
+*.log
+
+# Exclude your frontend if it's in the same repo
+frontend/
+
+# Exclude any local ChromaDB data folders if you have them
+chroma_data/

@@ -34,7 +34,7 @@ def contextualize_question(query: str, chat_history: List[dict]):
     Standalone Question:"""
 
     response = groq_client.chat.completions.create(
-        model="llama-3.3-70b-versatile",  # Using a fast model for re-querying
+        model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content": prompt}],
         temperature=0,
     )
@@ -42,10 +42,8 @@ def contextualize_question(query: str, chat_history: List[dict]):
 
 
 def retrieve_context(query, chat_history=None, n_results=3):
-    # 1. Reformulate the query if there is history
     standalone_query = contextualize_question(query, chat_history or [])
 
-    # 2. Convert standalone query to embedding
     query_vector = embedding_model.encode([standalone_query]).tolist()
 
     results = collection.query(
@@ -72,15 +70,12 @@ def generate_answer(query, context, model_name, chat_history=None):
     {context}
     """
 
-    # Build the message chain
     messages = [{"role": "system", "content": system_prompt}]
 
-    # Add history (last 5 turns to stay under token limits)
     if chat_history:
         for msg in chat_history[-5:]:
             messages.append({"role": msg["role"], "content": msg["content"]})
 
-    # Add current query
     messages.append({"role": "user", "content": query})
 
     response = groq_client.chat.completions.create(
