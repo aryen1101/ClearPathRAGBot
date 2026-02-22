@@ -165,6 +165,6 @@ AI Usage
 33. Generate a Readme.md for this complete project, It should include
 How to run the project locally — exact setup and start commands
 Which Groq models you used and any environment config
-Which bonus challenges you attempted, if any
+Which bonus challenges you attempted, if 
 Any known issues or limitations
 
