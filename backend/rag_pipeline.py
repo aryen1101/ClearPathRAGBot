@@ -18,7 +18,7 @@ def contextualize_question(query: str, chat_history: List[dict]):
     If the user uses pronouns (it, they, that), this reformulates the query
     based on the chat history into a standalone question for retrieval.
     """
-    if not chat_history:
+    if not chat_history or len(query.split()) < 3:
         return query
 
     history_str = "\n".join([f"{m['role']}: {m['content']}" for m in chat_history[-3:]])  # Take last 3 turns
