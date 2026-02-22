@@ -11,12 +11,14 @@ export const useChatStore = create(
 
       askQuestion: async (input) => {
         set({ loading: true });
+        const history = get().messages;
 
         const userMsg = { role: 'user', content: input };
         set((state) => ({ messages: [...state.messages, userMsg] }));
 
         try {
-          const data = await sendQuery(input);
+          const data = await sendQuery(input, history);
+
           const botMsg = {
             role: 'assistant',
             content: data.answer,
@@ -39,7 +41,10 @@ export const useChatStore = create(
 
       setSelectedData: (data) => set({ selectedData: data }),
 
-      clearSession: () => set({ messages: [], selectedData: null }),
+      clearSession: () => {
+        set({ messages: [], selectedData: null });
+        localStorage.removeItem('clearpath-chat-storage');
+      },
     }),
     {
       name: 'clearpath-chat-storage',

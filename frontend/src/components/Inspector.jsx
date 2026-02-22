@@ -18,7 +18,6 @@ export const Inspector = ({ data }) => {
 
   return (
     <div className="p-6 space-y-8 animate-in fade-in slide-in-from-right-8 duration-500 bg-[#0b141a] h-full border-l border-emerald-900/20">
-      {/* SECTION: PERFORMANCE STATS */}
       <section>
         <h3 className="text-[10px] font-black text-emerald-500/60 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
           <BarChart3 size={12} /> Pipeline Metrics
@@ -31,7 +30,6 @@ export const Inspector = ({ data }) => {
         </div>
       </section>
 
-      {/* SECTION: TOKEN USAGE (REFINED) */}
       <section>
         <h3 className="text-[10px] font-black text-emerald-500/60 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
           <Coins size={12} className="text-emerald-400" /> Token Usage
@@ -43,7 +41,6 @@ export const Inspector = ({ data }) => {
         </div>
       </section>
 
-      {/* SECTION: CONTEXT SOURCES */}
       <section>
         <h3 className="text-[10px] font-black text-emerald-500/60 uppercase tracking-[0.2em] mb-4">Retrieved Knowledge</h3>
         <div className="space-y-3">

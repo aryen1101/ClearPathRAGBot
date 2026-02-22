@@ -5,63 +5,87 @@ from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
 from typing import List, Any, cast
 
-# Load environment variables
 load_dotenv()
 
-# Initialize ChromaDB, Embedding Model, and Groq Client
 client = chromadb.PersistentClient(path="./chroma_db")
 collection = client.get_or_create_collection("docs")
 embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 
-def retrieve_context(query, n_results=3):
+def contextualize_question(query: str, chat_history: List[dict]):
     """
-    Finds the most relevant chunks from ChromaDB.
+    If the user uses pronouns (it, they, that), this reformulates the query
+    based on the chat history into a standalone question for retrieval.
     """
-    # Convert query to embedding
-    query_vector = embedding_model.encode([query]).tolist()
+    if not chat_history:
+        return query
 
-    # Query the collection
+    history_str = "\n".join([f"{m['role']}: {m['content']}" for m in chat_history[-3:]])  # Take last 3 turns
+
+    prompt = f"""
+    Given the following chat history and a follow-up question, rephrase the follow-up 
+    question to be a standalone question that includes all necessary context.
+
+    Chat History:
+    {history_str}
+
+    Follow-up Question: {query}
+    Standalone Question:"""
+
+    response = groq_client.chat.completions.create(
+        model="llama-3.3-70b-versatile",  # Using a fast model for re-querying
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0,
+    )
+    return response.choices[0].message.content
+
+
+def retrieve_context(query, chat_history=None, n_results=3):
+    # 1. Reformulate the query if there is history
+    standalone_query = contextualize_question(query, chat_history or [])
+
+    # 2. Convert standalone query to embedding
+    query_vector = embedding_model.encode([standalone_query]).tolist()
+
     results = collection.query(
         query_embeddings=query_vector,
         n_results=n_results
     )
 
-    # 1. Extract the documents (text)
     context_chunks = results['documents'][0]
-
-    # 2. Extract the 'distance' (similarity score)
     distances = results['distances'][0]
-
-    # 3. Extract the 'metadatas' (contains the source filename)
     metadatas = results['metadatas'][0]
 
-    # Return ALL THREE values to match what main.py expects
     return "\n\n".join(context_chunks), distances, metadatas
 
 
-def generate_answer(query, context, model_name):
+def generate_answer(query, context, model_name, chat_history=None):
     """
-    Sends the prompt to Groq and returns the response with token usage/latency.
+    Generates response using context and the full conversation history.
     """
     system_prompt = f"""
-    You are a customer support agent for Clearpath, a project management tool.
-    Answer the user's question using ONLY the provided context.
-    If the answer is not in the context, say you don't know.
+    You are a customer support agent for Clearpath. 
+    Answer using ONLY the provided context. If the answer isn't there, say you don't know.
 
     Context:
     {context}
     """
 
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": query}
-    ]
+    # Build the message chain
+    messages = [{"role": "system", "content": system_prompt}]
+
+    # Add history (last 5 turns to stay under token limits)
+    if chat_history:
+        for msg in chat_history[-5:]:
+            messages.append({"role": msg["role"], "content": msg["content"]})
+
+    # Add current query
+    messages.append({"role": "user", "content": query})
 
     response = groq_client.chat.completions.create(
         model=model_name,
-        messages=cast(Any, messages),  # This silences the warning
+        messages=cast(Any, messages),
         temperature=0,
     )
 

@@ -5,17 +5,20 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' }
 });
 
-export const sendQuery = async (question, conversationId = null) => {
+export const sendQuery = async (question, history = [], conversationId = null) => {
   try {
     const response = await api.post('/query', {
       question,
+      chat_history: history.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      })),
       conversation_id: conversationId,
     });
 
-
     return response.data;
   } catch (error) {
-    console.error('API Error:', error.response?.data || error.message);
+    console.error('API Error Details:', error.response?.data || error.message);
     throw error;
   }
 };

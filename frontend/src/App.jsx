@@ -19,7 +19,6 @@ export default function App() {
 
   return (
     <div className="flex h-screen bg-[#0b141a] p-4 lg:p-6 gap-4 font-sans antialiased text-slate-200">
-      {/* MAIN CHAT PANEL */}
       <div className="flex-1 flex flex-col bg-[#121b22] border border-emerald-900/20 rounded-[28px] shadow-2xl overflow-hidden relative">
         <header className="px-8 py-5 border-b border-emerald-900/20 flex justify-between items-center bg-[#121b22]/90 backdrop-blur-md z-10">
           <div className="flex items-center gap-4">
@@ -71,7 +70,6 @@ export default function App() {
         </footer>
       </div>
 
-      {/* INSPECTOR PANEL */}
       <aside className="w-96 bg-[#121b22] border border-emerald-900/20 rounded-[28px] shadow-2xl overflow-hidden hidden xl:flex flex-col">
         <div className="p-6 border-b border-emerald-900/20">
           <h2 className="font-bold text-emerald-100 text-sm flex items-center gap-2 tracking-tight uppercase">

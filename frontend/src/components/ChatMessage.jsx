@@ -8,7 +8,6 @@ export const ChatMessage = ({ message, onSelect }) => {
     <div className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'} mb-8 group animate-in fade-in slide-in-from-bottom-4 duration-500`}>
       <div className={`relative flex gap-4 max-w-[90%] transition-transform group-hover:scale-[1.01] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
 
-        {/* Status Indicator Icon */}
         <div className={`mt-1 w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-lg transition-all duration-500 ${
           isUser
           ? 'bg-emerald-600 text-white rotate-3 group-hover:rotate-0'
@@ -17,7 +16,6 @@ export const ChatMessage = ({ message, onSelect }) => {
           {isUser ? <User size={20} /> : <Bot size={20} />}
         </div>
 
-        {/* The Message Card */}
         <div
           onClick={() => !isUser && onSelect(message)}
           className={`relative overflow-hidden p-5 rounded-[24px] border transition-all duration-300 ${
@@ -26,7 +24,6 @@ export const ChatMessage = ({ message, onSelect }) => {
             : 'bg-slate-900/60 border-slate-700/50 text-slate-200 cursor-pointer hover:border-emerald-500/50 hover:bg-slate-800/80 shadow-xl'
           }`}
         >
-          {/* Subtle Background Glow for Bot */}
           {!isUser && (
             <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-emerald-500/5 blur-3xl rounded-full" />
           )}
